@@ -27,10 +27,9 @@ This project contains a simple `Dockerfile` to containerize a static frontend fo
     ```
 
 4.  **Access the application:**
-    Open your web browser and go to `http://localhost:8081`. You should see "Welcome to FinTechApp v1".
+    Open your web browser and go to `http://localhost:8081`.
 
 5.  **Clean up:**
-    When you are finished, stop and remove the container.
     ```bash
     docker stop fintech-container
     docker rm fintech-container
@@ -38,32 +37,58 @@ This project contains a simple `Dockerfile` to containerize a static frontend fo
 
 ---
 
+## Data Persistence: Volumes vs. Bind Mounts
+
+Containers are ephemeral, meaning any data written inside a container is lost when the container is removed. To save (persist) data, we use volumes or bind mounts.
+
+### 1. Named Volumes (Docker-Managed)
+
+This is the recommended way to persist production data. Docker creates and manages a dedicated folder on the host's filesystem, and you just refer to it by its name.
+
+* **Use Case:** Best for data that is generated *by the container*, such as a database, application logs, or user-uploaded content that you don't need to edit from the host.
+* **Analogy:** A "safe deposit box" managed by Docker.
+
+**Commands:**
+
+* Create a volume:
+    ```bash
+    docker volume create my-data
+    ```
+* Mount the volume when running a container:
+    ```bash
+    docker run -v my-data:/path/in/container my-image
+    ```
+* List volumes:
+    ```bash
+    docker volume ls
+    ```
+* Remove a volume:
+    ```bash
+    docker volume rm my-data
+    ```
+
+### 2. Bind Mounts (User-Managed)
+
+This method mounts a specific, existing directory or file from your host machine into the container. You manage the files on your host.
+
+* **Use Case:** Best for **development**. You can mount your source code directory into the container. When you edit the code on your host, the changes are instantly reflected inside the container, allowing for live reloading.
+* **Analogy:** "Your own desk drawer" that you give the container access to.
+
+**Command:**
+
+* Mount a directory from your host (using `$(pwd)` to get the current working directory's full path):
+    ```bash
+    docker run -v $(pwd)/my-app-code:/app my-image
+    ```
+
+---
+
 ## Basic Docker Command Reference
 
-This section serves as a quick reference for the foundational Docker commands.
-
-### `docker run`
-
-**Purpose:** Creates and starts a new container from a specified image.
-
-**Common Flags:**
-* `--detach` or `-d`: Runs the container in the background.
-* `--publish <host_port>:<container_port>`: Maps a port on the host to a port inside the container.
-
-### `docker ps`
-
-**Purpose:** Lists all *running* containers.
-* `-a` or `--all`: Shows all containers, including stopped ones.
-
-### `docker stop`
-
-**Purpose:** Gracefully stops one or more running containers.
-* **Usage:** `docker stop <container_id_or_name>`
-
-### `docker rm`
-
-**Purpose:** Removes one or more *stopped* containers.
-* **Usage:** `docker rm <container_id_or_name>`
+* **`docker run`**: Creates and starts a new container from an image.
+* **`docker ps`**: Lists all *running* containers. (`-a` shows all).
+* **`docker stop`**: Gracefully stops one or more running containers.
+* **`docker rm`**: Removes one or more *stopped* containers.
 
 ---
 
